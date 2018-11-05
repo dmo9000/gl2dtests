@@ -19,11 +19,14 @@ int display_height = 0;
 void display();
 void reshape_window(GLsizei w, GLsizei h);
 
+int vxoffset = 0;
+
 // Use new drawing method
 //typedef unsigned __int8 u8;
 typedef unsigned char u8;
 u8 screenData[SCREEN_HEIGHT][SCREEN_WIDTH][3];
 void setupTexture();
+char *p = "HELLO WORLD\0";
 
 int main(int argc, char **argv)
 {
@@ -61,9 +64,20 @@ int main(int argc, char **argv)
     return 0;
 }
 
+void setTexturePixel(int x, int y, u8 r, u8 g, u8 b)
+{
+
+		screenData[y][x][0] = r;
+		screenData[y][x][1] = g;
+		screenData[y][x][2] = b;
+
+}
+
 // Setup Texture
 void setupTexture()
 {
+
+
     // Clear screen
     for(int y = 0; y < SCREEN_HEIGHT; ++y)	{
         for(int x = 0; x < SCREEN_WIDTH; ++x) {
@@ -93,8 +107,39 @@ void setupTexture()
 }
 
 //void updateTexture(const chip8& c8)
+//
+void output_character(char c)
+{
+	int i = 0, j = 0;
+	static int cx=0, cy=0;
+	
+
+	for (j = (cy * 16); j < (cy*16) + 16; j++) {
+		for (i = (cx * 8); i < (cx*8) + 8; i++) {
+				setTexturePixel(i, j, 0, 0, 0);
+				}
+			}
+
+	cx++;
+	if (cx == 80)	{
+		cx = 0;
+		cy ++;
+		}
+	
+
+	printf("OUTPUT=[%c][%u], cx=%d, cy=%d\r\n", p[0], p[0], cx, cy);
+
+}
+
 void updateTexture()
 {
+
+		while (p[0] != 0) {
+			//	printf("OUTPUT=[%c][%u]\r\n", p[0], p[0]);
+				output_character(p[0]);	
+				p++;
+				}
+
     // Update pixels
 //    for(int y = 0; y < 32; ++y)
 //        for(int x = 0; x < 64; ++x)
@@ -120,6 +165,7 @@ void updateTexture()
 
 void display()
 {
+//		printf("display()\n");
 //   myChip8.emulateCycle();
 
 //    if(myChip8.drawFlag)
@@ -140,6 +186,7 @@ void display()
 
 void reshape_window(GLsizei w, GLsizei h)
 {
+		printf("reshape_window()\n");
     glClearColor(0.0f, 0.0f, 0.5f, 0.0f);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
