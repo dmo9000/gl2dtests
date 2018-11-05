@@ -2,10 +2,13 @@
 //#include <glut.h>
 //#include "chip8.h"
 #include <GL/glut.h>
+//#include "font8x8.h"
+#include "rawfont.h"
+#include "ansicanvas.h"
 
 // Display size
-#define SCREEN_WIDTH 		640	
-#define SCREEN_HEIGHT 	480	
+#define SCREEN_WIDTH 		640
+#define SCREEN_HEIGHT 	480
 
 //chip8 myChip8;
 int modifier = 1;
@@ -28,15 +31,88 @@ u8 screenData[SCREEN_HEIGHT][SCREEN_WIDTH][3];
 void setupTexture();
 char *p = "HELLO WORLD\0";
 
+int gfx_opengl_drawglyph(BitmapFont *font, uint16_t px, uint16_t py, uint8_t glyph, uint8_t fg, uint8_t bg, uint8_t attr)
+{
+
+    RGBColour *fgc;
+    RGBColour *bgc;
+    uint8_t rx = 0;
+    uint8_t h = 0;
+
+//    png_bytep row;
+//    png_bytep pixel;
+
+    printf("gfx_opengl_drawglyph(%u, %u, %u, %u, '%c')\n", px, py, font->header.px, font->header.py, glyph);
+    return 0;
+
+    /*
+    if (attr & ATTRIB_REVERSE) {
+        bgc = canvas_displaycolour(fg + ((attr & ATTRIB_BOLD ? 8 : 0)));
+        fgc = canvas_displaycolour(bg);
+        } else {
+        fgc = canvas_displaycolour(fg + ((attr & ATTRIB_BOLD ? 8 : 0)));
+        bgc = canvas_displaycolour(bg);
+        }
+    */
+    /*
+        for (uint8_t ii = 0; ii < font->header.py; ii++) {
+            h = 0;
+            for (uint8_t jj = 128; jj >0; jj = jj >> 1) {
+                //printf("%u -> %u, ", r, jj);
+                rx = font->fontdata[(glyph*font->header.py) + ii];
+
+                if (rx & jj) {
+                    row = row_pointers[(py*16) + (ii*2)];
+                    pixel = &(row[((px*8) + h) * 4]);
+                    pixel[0] = fgc->r;
+                    pixel[1] = fgc->g;
+                    pixel[2] = fgc->b;
+                    pixel[3] = 255;
+                    row = row_pointers[(py*16) + (ii*2)+1];
+                    pixel = &(row[((px*8) + h) * 4]);
+                    pixel[0] = fgc->r;
+                    pixel[1] = fgc->g;
+                    pixel[2] = fgc->b;
+                    pixel[3] = 255;
+                    //printf("X");
+                } else {
+                    row = row_pointers[(py*16) + (ii*2)];
+                    pixel = &(row[((px*8) + h) * 4]);
+                    pixel[0] = bgc->r;
+                    pixel[1] = bgc->g;
+                    pixel[2] = bgc->b;
+                    pixel[3] = 255;
+                    row = row_pointers[(py*16) + (ii*2)+1];
+                    pixel = &(row[((px*8) + h) * 4]);
+                    pixel[0] = bgc->r;
+                    pixel[1] = bgc->g;
+                    pixel[2] = bgc->b;
+                    pixel[3] = 255;
+                    //printf(" ");
+                }
+                h++;
+            }
+            //printf("\n");
+        }
+    	*/
+    return 0;
+}
+
+
 int main(int argc, char **argv)
 {
-    /*
-    if(argc < 2)
-    {
-        printf("Usage: myChip8.exe chip8application\n\n");
-        return 1;
+		char *filename = NULL;
+    BitmapFont *myfont;
+    filename = "bmf/8x8.bmf";
+
+    myfont = bmf_load(filename);
+
+    if (!myfont) {
+        perror("bmf_load");
+        exit(1);
     }
-    */
+
+
     display_width = SCREEN_WIDTH * modifier;
     display_height = SCREEN_HEIGHT * modifier;
 
@@ -67,9 +143,9 @@ int main(int argc, char **argv)
 void setTexturePixel(int x, int y, u8 r, u8 g, u8 b)
 {
 
-		screenData[y][x][0] = r;
-		screenData[y][x][1] = g;
-		screenData[y][x][2] = b;
+    screenData[y][x][0] = r;
+    screenData[y][x][1] = g;
+    screenData[y][x][2] = b;
 
 }
 
@@ -110,35 +186,35 @@ void setupTexture()
 //
 void output_character(char c)
 {
-	int i = 0, j = 0;
-	static int cx=0, cy=0;
-	
+    int i = 0, j = 0;
+    static int cx=0, cy=0;
 
-	for (j = (cy * 16); j < (cy*16) + 16; j++) {
-		for (i = (cx * 8); i < (cx*8) + 8; i++) {
-				setTexturePixel(i, j, 0, 0, 0);
-				}
-			}
 
-	cx++;
-	if (cx == 80)	{
-		cx = 0;
-		cy ++;
-		}
-	
+    for (j = (cy * 16); j < (cy*16) + 16; j++) {
+        for (i = (cx * 8); i < (cx*8) + 8; i++) {
+            setTexturePixel(i, j, 0, 0, 0);
+        }
+    }
 
-	printf("OUTPUT=[%c][%u], cx=%d, cy=%d\r\n", p[0], p[0], cx, cy);
+    cx++;
+    if (cx == 80)	{
+        cx = 0;
+        cy ++;
+    }
+
+
+    printf("OUTPUT=[%c][%u], cx=%d, cy=%d\r\n", p[0], p[0], cx, cy);
 
 }
 
 void updateTexture()
 {
 
-		while (p[0] != 0) {
-			//	printf("OUTPUT=[%c][%u]\r\n", p[0], p[0]);
-				output_character(p[0]);	
-				p++;
-				}
+    while (p[0] != 0) {
+        //	printf("OUTPUT=[%c][%u]\r\n", p[0], p[0]);
+        output_character(p[0]);
+        p++;
+    }
 
     // Update pixels
 //    for(int y = 0; y < 32; ++y)
@@ -186,7 +262,7 @@ void display()
 
 void reshape_window(GLsizei w, GLsizei h)
 {
-		printf("reshape_window()\n");
+    printf("reshape_window()\n");
     glClearColor(0.0f, 0.0f, 0.5f, 0.0f);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
