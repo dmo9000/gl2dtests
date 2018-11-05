@@ -43,46 +43,46 @@ int gfx_opengl_drawglyph(BitmapFont *font, uint16_t px, uint16_t py, uint8_t gly
 //    png_bytep row;
 //    png_bytep pixel;
 
-    printf("gfx_opengl_drawglyph(%u, %u, %u, %u, '%c')\n", px, py, font->header.px, font->header.py, glyph);
+//    printf("gfx_opengl_drawglyph(%u, %u, %u, %u, '%c', fg=%u, bg=%u)\n", px, py, font->header.px, font->header.py, glyph, fg, bg);
 
     if (attr & ATTRIB_REVERSE) {
         bgc = canvas_displaycolour(fg + ((attr & ATTRIB_BOLD ? 8 : 0)));
         fgc = canvas_displaycolour(bg);
-        } else {
+    } else {
         fgc = canvas_displaycolour(fg + ((attr & ATTRIB_BOLD ? 8 : 0)));
         bgc = canvas_displaycolour(bg);
-        }
+    }
 
-        for (uint8_t ii = 0; ii < font->header.py; ii++) {
-            h = 0;
-            for (uint8_t jj = 128; jj >0; jj = jj >> 1) {
-                //printf("%u -> %u, ", r, jj);
-                rx = font->fontdata[(glyph*font->header.py) + ii];
+    for (uint8_t ii = 0; ii < font->header.py; ii++) {
+        h = 0;
+        for (uint8_t jj = 128; jj >0; jj = jj >> 1) {
+            //printf("%u -> %u, ", r, jj);
+            rx = font->fontdata[(glyph*font->header.py) + ii];
 
-                if (rx & jj) {
+            if (rx & jj) {
 //										setTexturePixel((px*8) + h, (py*16)+(ii*2), fgc->r, fgc->g, fgc->b);
 //										setTexturePixel((px*8) + h, (py*16)+(ii*2)+1, fgc->r, fgc->g, fgc->b);
-											setTexturePixel((px*8) + h, (py*16)+(ii*2), 255, 255, 255);
-											setTexturePixel((px*8) + h, (py*16)+(ii*2)+1, 255, 255, 255);
+                setTexturePixel((px*8) + h, (py*16)+(ii*2), 255, 255, 255);
+                setTexturePixel((px*8) + h, (py*16)+(ii*2)+1, 255, 255, 255);
 //                    printf("X");
-                } else {
+            } else {
 //										setTexturePixel((px*8) + h, (py*16)+(ii*2), bgc->r, bgc->g, bgc->b);
 //										setTexturePixel((px*8) + h, (py*16)+(ii*2)+1, bgc->r, bgc->g, bgc->b);
-											setTexturePixel((px*8) + h, (py*16)+(ii*2), 0, 0, 0);
-											setTexturePixel((px*8) + h, (py*16)+(ii*2)+1, 0, 0, 0);
+                setTexturePixel((px*8) + h, (py*16)+(ii*2), 0, 0, 0);
+                setTexturePixel((px*8) + h, (py*16)+(ii*2)+1, 0, 0, 0);
 //										printf(" ");
-                }
-                h++;
             }
-            printf("\n");
+            h++;
         }
+        //  printf("\n");
+    }
     return 0;
 }
 
 
 int main(int argc, char **argv)
 {
-		char *filename = NULL;
+    char *filename = NULL;
     filename = "bmf/8x8.bmf";
 
     myfont = bmf_load(filename);
@@ -168,15 +168,16 @@ void output_character(char c)
     int i = 0, j = 0;
     static int cx=0, cy=0;
 
-		
 
+    /*
     for (j = (cy * 16); j < (cy*16) + 16; j++) {
         for (i = (cx * 8); i < (cx*8) + 8; i++) {
             setTexturePixel(i, j, 0, 0, 0);
         }
     }
+    */
 
-		 gfx_opengl_drawglyph(myfont, cx, cy, c, 0, 7, 0);
+    gfx_opengl_drawglyph(myfont, cx, cy, c, 7, 0, 0);
     cx++;
     if (cx == 80)	{
         cx = 0;
@@ -184,7 +185,7 @@ void output_character(char c)
     }
 
 
-    printf("OUTPUT=[%c][%u], cx=%d, cy=%d\r\n", p[0], p[0], cx, cy);
+//    printf("OUTPUT=[%c][%u], cx=%d, cy=%d\r\n", p[0], p[0], cx, cy);
 
 }
 
