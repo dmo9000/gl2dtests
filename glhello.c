@@ -13,9 +13,13 @@ void display() {
     // Draw a Red 1x1 Square centered at origin
     glBegin(GL_QUADS);              // Each set of 4 vertices form a quad
     glColor3f(1.0f, 0.0f, 0.0f); // Red
+    glTexCoord2f(0.0,0.0);
     glVertex2f(-0.75f, -0.75f);    // x, y
+    glTexCoord2f(1.0,0.0);
     glVertex2f( 0.75f, -0.75f);
+    glTexCoord2f(1.0,1.0);
     glVertex2f( 0.75f,  0.75f);
+    glTexCoord2f(0.0,1.0);
     glVertex2f(-0.75f,  0.75f);
     glEnd();
 
