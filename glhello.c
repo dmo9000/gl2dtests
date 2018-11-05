@@ -1,80 +1,153 @@
-/*
- *  * GL01Hello.cpp: Test OpenGL C/C++ Setup
- *   */
-//#include <windows.h>  // For MS Windows
-#include <GL/glut.h>  // GLUT, includes glu.h and gl.h
+#include <stdio.h>
+//#include <glut.h>
+//#include "chip8.h"
+#include <GL/glut.h>
 
-/* Handler for window-repaint event. Call back when the window first appears and
- *    whenever the window needs to be re-painted. */
+// Display size
+#define SCREEN_WIDTH 		320	
+#define SCREEN_HEIGHT 	240
 
+//chip8 myChip8;
+int modifier = 2;
 
-#define checkImageWidth 64
-#define checkImageHeight 64
-static GLubyte checkImage[checkImageHeight][checkImageWidth][4];
-static GLuint texName;
+// Window size
+//int display_width = SCREEN_WIDTH * modifier;
+//int display_height = SCREEN_HEIGHT * modifier;
+int display_width = 0;
+int display_height = 0;
 
-void makeCheckImage(void)
+void display();
+void reshape_window(GLsizei w, GLsizei h);
+
+// Use new drawing method
+//typedef unsigned __int8 u8;
+typedef unsigned char u8;
+u8 screenData[SCREEN_HEIGHT][SCREEN_WIDTH][3];
+void setupTexture();
+
+int main(int argc, char **argv)
 {
-    int i, j, c;
+    /*
+    if(argc < 2)
+    {
+        printf("Usage: myChip8.exe chip8application\n\n");
+        return 1;
+    }
+    */
+    display_width = SCREEN_WIDTH * modifier;
+    display_height = SCREEN_HEIGHT * modifier;
 
-    for (i = 0; i < checkImageHeight; i++) {
-        for (j = 0; j < checkImageWidth; j++) {
-            c = ((((i&0x8)==0)^((j&0x8))==0))*255;
-            checkImage[i][j][0] = (GLubyte) c;
-            checkImage[i][j][1] = (GLubyte) c;
-            checkImage[i][j][2] = (GLubyte) c;
-            checkImage[i][j][3] = (GLubyte) 255;
+
+    // Load game
+//    if(!myChip8.loadApplication(argv[1]))
+//        return 1;
+
+    // Setup OpenGL
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
+
+    glutInitWindowSize(display_width, display_height);
+    glutInitWindowPosition(320, 320);
+    glutCreateWindow("myChip8 by Laurence Muller");
+
+    glutDisplayFunc(display);
+    glutIdleFunc(display);
+    glutReshapeFunc(reshape_window);
+
+    setupTexture();
+
+    glutMainLoop();
+
+    return 0;
+}
+
+// Setup Texture
+void setupTexture()
+{
+    // Clear screen
+    for(int y = 0; y < SCREEN_HEIGHT; ++y)	{
+        for(int x = 0; x < SCREEN_WIDTH; ++x) {
+            if (y % 2) {
+                screenData[y][x][0] = 255;
+                screenData[y][x][1] = 0;
+                screenData[y][x][2] = 0;
+            } else {
+                screenData[y][x][0] = 0;
+                screenData[y][x][1] = 255;
+                screenData[y][x][2] = 0;
+            }
         }
     }
+
+    // Create a texture
+    glTexImage2D(GL_TEXTURE_2D, 0, 3, SCREEN_WIDTH, SCREEN_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)screenData);
+
+    // Set up the texture
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
+    // Enable textures
+    glEnable(GL_TEXTURE_2D);
 }
 
-void display() {
-    glClearColor(0.0f, 1.0f, 0.0f, 1.0f); // Set background color to black and opaque
-    glClear(GL_COLOR_BUFFER_BIT);         // Clear the color buffer
+//void updateTexture(const chip8& c8)
+void updateTexture()
+{
+    // Update pixels
+//    for(int y = 0; y < 32; ++y)
+//        for(int x = 0; x < 64; ++x)
+//           if(c8.gfx[(y * 64) + x] == 0)
+    //              screenData[y][x][0] = screenData[y][x][1] = screenData[y][x][2] = 0;	// Disabled
+    //         else
+    //            screenData[y][x][0] = screenData[y][x][1] = screenData[y][x][2] = 255;  // Enabled
 
-    // Draw a Red 1x1 Square centered at origin
-    glBegin(GL_QUADS);              // Each set of 4 vertices form a quad
-//    glColor3f(1.0f, 0.0f, 0.0f); // Red
-    glTexCoord2f(0.0,0.0);
-    glVertex2f(-0.85f, -0.85f);    // x, y
-    glTexCoord2f(1.0,0.0);
-    glVertex2f( 0.85f, -0.85f);
-    glTexCoord2f(1.0,1.0);
-    glVertex2f( 0.85f,  0.85f);
-    glTexCoord2f(0.0,1.0);
-    glVertex2f(-0.85f,  0.85f);
+    // Update Texture
+    glTexSubImage2D(GL_TEXTURE_2D, 0,0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)screenData);
+
+    glBegin( GL_QUADS );
+    glTexCoord2d(0.0, 0.0);
+    glVertex2d(0.0,			  0.0);
+    glTexCoord2d(1.0, 0.0);
+    glVertex2d(display_width, 0.0);
+    glTexCoord2d(1.0, 1.0);
+    glVertex2d(display_width, display_height);
+    glTexCoord2d(0.0, 1.0);
+    glVertex2d(0.0,			  display_height);
     glEnd();
-
-    glFlush();  // Render now
 }
 
-/* Main function: GLUT runs as a console application starting at main()  */
-int main(int argc, char** argv) {
-    GLenum error;
-    glutInit(&argc, argv);                 // Initialize GLUT
+void display()
+{
+//   myChip8.emulateCycle();
 
-    makeCheckImage();
-//    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+//    if(myChip8.drawFlag)
+//    {
+    // Clear framebuffer
+    glClear(GL_COLOR_BUFFER_BIT);
 
-    glGenTextures(1, &texName);
-    glBindTexture(GL_TEXTURE_2D, texName);
-    glEnable( GL_TEXTURE_2D );
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-//                    GL_NEAREST);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-//                    GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, checkImageWidth,
-                 checkImageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE,
-                 checkImage);
-    error = glGetError();
+    // Draw pixels to texture
+    //updateTexture(myChip8);
+    updateTexture();
+    // Swap buffers!
+    glutSwapBuffers();
 
-    glutInitWindowSize(1440, 900);   // Set the window's initial width & height
-    glutCreateWindow("OpenGL Setup Test"); // Create a window with the given title
-//    glutInitWindowSize(512, 512);   // Set the window's initial width & height
-    glutInitWindowPosition(50, 50); // Position the window's initial top-left corner
-    glutDisplayFunc(display); // Register display callback handler for window re-paint
-    glutMainLoop();           // Enter the infinitely event-processing loop
-    return 0;
+    // Processed frame
+//        myChip8.drawFlag = false;
+// 	}
+}
+
+void reshape_window(GLsizei w, GLsizei h)
+{
+    glClearColor(0.0f, 0.0f, 0.5f, 0.0f);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(0, w, h, 0);
+    glMatrixMode(GL_MODELVIEW);
+    glViewport(0, 0, w, h);
+
+    // Resize quad
+    display_width = w;
+    display_height = h;
 }

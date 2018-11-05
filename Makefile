@@ -5,7 +5,7 @@
 
 
 glhello:	glhello.o
-	$(CC) -o glhello glhello.o -lglut -lGL
+	$(CC) -o glhello glhello.o -lglut -lGLU -lGL
 	
 
 
