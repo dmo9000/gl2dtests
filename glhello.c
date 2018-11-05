@@ -4,11 +4,11 @@
 #include <GL/glut.h>
 
 // Display size
-#define SCREEN_WIDTH 		320	
-#define SCREEN_HEIGHT 	240
+#define SCREEN_WIDTH 		640	
+#define SCREEN_HEIGHT 	480	
 
 //chip8 myChip8;
-int modifier = 2;
+int modifier = 1;
 
 // Window size
 //int display_width = SCREEN_WIDTH * modifier;
