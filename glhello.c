@@ -29,7 +29,8 @@ int vxoffset = 0;
 typedef unsigned char u8;
 u8 screenData[SCREEN_HEIGHT][SCREEN_WIDTH][3];
 void setupTexture();
-char *p = "HELLO WORLD\0";
+char *p = "HELLO WORLD THIS IS YOUR CAPTAIN SPEAKING, PLEASE STANDBY";
+BitmapFont *myfont;
 
 int gfx_opengl_drawglyph(BitmapFont *font, uint16_t px, uint16_t py, uint8_t glyph, uint8_t fg, uint8_t bg, uint8_t attr)
 {
@@ -43,9 +44,7 @@ int gfx_opengl_drawglyph(BitmapFont *font, uint16_t px, uint16_t py, uint8_t gly
 //    png_bytep pixel;
 
     printf("gfx_opengl_drawglyph(%u, %u, %u, %u, '%c')\n", px, py, font->header.px, font->header.py, glyph);
-    return 0;
 
-    /*
     if (attr & ATTRIB_REVERSE) {
         bgc = canvas_displaycolour(fg + ((attr & ATTRIB_BOLD ? 8 : 0)));
         fgc = canvas_displaycolour(bg);
@@ -53,8 +52,7 @@ int gfx_opengl_drawglyph(BitmapFont *font, uint16_t px, uint16_t py, uint8_t gly
         fgc = canvas_displaycolour(fg + ((attr & ATTRIB_BOLD ? 8 : 0)));
         bgc = canvas_displaycolour(bg);
         }
-    */
-    /*
+
         for (uint8_t ii = 0; ii < font->header.py; ii++) {
             h = 0;
             for (uint8_t jj = 128; jj >0; jj = jj >> 1) {
@@ -62,39 +60,22 @@ int gfx_opengl_drawglyph(BitmapFont *font, uint16_t px, uint16_t py, uint8_t gly
                 rx = font->fontdata[(glyph*font->header.py) + ii];
 
                 if (rx & jj) {
-                    row = row_pointers[(py*16) + (ii*2)];
-                    pixel = &(row[((px*8) + h) * 4]);
-                    pixel[0] = fgc->r;
-                    pixel[1] = fgc->g;
-                    pixel[2] = fgc->b;
-                    pixel[3] = 255;
-                    row = row_pointers[(py*16) + (ii*2)+1];
-                    pixel = &(row[((px*8) + h) * 4]);
-                    pixel[0] = fgc->r;
-                    pixel[1] = fgc->g;
-                    pixel[2] = fgc->b;
-                    pixel[3] = 255;
-                    //printf("X");
+//										setTexturePixel((px*8) + h, (py*16)+(ii*2), fgc->r, fgc->g, fgc->b);
+//										setTexturePixel((px*8) + h, (py*16)+(ii*2)+1, fgc->r, fgc->g, fgc->b);
+											setTexturePixel((px*8) + h, (py*16)+(ii*2), 255, 255, 255);
+											setTexturePixel((px*8) + h, (py*16)+(ii*2)+1, 255, 255, 255);
+//                    printf("X");
                 } else {
-                    row = row_pointers[(py*16) + (ii*2)];
-                    pixel = &(row[((px*8) + h) * 4]);
-                    pixel[0] = bgc->r;
-                    pixel[1] = bgc->g;
-                    pixel[2] = bgc->b;
-                    pixel[3] = 255;
-                    row = row_pointers[(py*16) + (ii*2)+1];
-                    pixel = &(row[((px*8) + h) * 4]);
-                    pixel[0] = bgc->r;
-                    pixel[1] = bgc->g;
-                    pixel[2] = bgc->b;
-                    pixel[3] = 255;
-                    //printf(" ");
+//										setTexturePixel((px*8) + h, (py*16)+(ii*2), bgc->r, bgc->g, bgc->b);
+//										setTexturePixel((px*8) + h, (py*16)+(ii*2)+1, bgc->r, bgc->g, bgc->b);
+											setTexturePixel((px*8) + h, (py*16)+(ii*2), 0, 0, 0);
+											setTexturePixel((px*8) + h, (py*16)+(ii*2)+1, 0, 0, 0);
+//										printf(" ");
                 }
                 h++;
             }
-            //printf("\n");
+            printf("\n");
         }
-    	*/
     return 0;
 }
 
@@ -102,7 +83,6 @@ int gfx_opengl_drawglyph(BitmapFont *font, uint16_t px, uint16_t py, uint8_t gly
 int main(int argc, char **argv)
 {
 		char *filename = NULL;
-    BitmapFont *myfont;
     filename = "bmf/8x8.bmf";
 
     myfont = bmf_load(filename);
@@ -117,7 +97,6 @@ int main(int argc, char **argv)
     display_height = SCREEN_HEIGHT * modifier;
 
 
-    // Load game
 //    if(!myChip8.loadApplication(argv[1]))
 //        return 1;
 
@@ -127,7 +106,7 @@ int main(int argc, char **argv)
 
     glutInitWindowSize(display_width, display_height);
     glutInitWindowPosition(320, 320);
-    glutCreateWindow("myChip8 by Laurence Muller");
+    glutCreateWindow("68K");
 
     glutDisplayFunc(display);
     glutIdleFunc(display);
@@ -189,6 +168,7 @@ void output_character(char c)
     int i = 0, j = 0;
     static int cx=0, cy=0;
 
+		
 
     for (j = (cy * 16); j < (cy*16) + 16; j++) {
         for (i = (cx * 8); i < (cx*8) + 8; i++) {
@@ -196,6 +176,7 @@ void output_character(char c)
         }
     }
 
+		 gfx_opengl_drawglyph(myfont, cx, cy, c, 0, 7, 0);
     cx++;
     if (cx == 80)	{
         cx = 0;
