@@ -14,13 +14,13 @@ void display() {
     glBegin(GL_QUADS);              // Each set of 4 vertices form a quad
     glColor3f(1.0f, 0.0f, 0.0f); // Red
     glTexCoord2f(0.0,0.0);
-    glVertex2f(-0.75f, -0.75f);    // x, y
+    glVertex2f(-0.85f, -0.85f);    // x, y
     glTexCoord2f(1.0,0.0);
-    glVertex2f( 0.75f, -0.75f);
+    glVertex2f( 0.85f, -0.85f);
     glTexCoord2f(1.0,1.0);
-    glVertex2f( 0.75f,  0.75f);
+    glVertex2f( 0.85f,  0.85f);
     glTexCoord2f(0.0,1.0);
-    glVertex2f(-0.75f,  0.75f);
+    glVertex2f(-0.85f,  0.85f);
     glEnd();
 
     glFlush();  // Render now
@@ -29,8 +29,9 @@ void display() {
 /* Main function: GLUT runs as a console application starting at main()  */
 int main(int argc, char** argv) {
     glutInit(&argc, argv);                 // Initialize GLUT
+    glutInitWindowSize(1440, 900);   // Set the window's initial width & height
     glutCreateWindow("OpenGL Setup Test"); // Create a window with the given title
-    glutInitWindowSize(512, 512);   // Set the window's initial width & height
+//    glutInitWindowSize(512, 512);   // Set the window's initial width & height
     glutInitWindowPosition(50, 50); // Position the window's initial top-left corner
     glutDisplayFunc(display); // Register display callback handler for window re-paint
     glutMainLoop();           // Enter the infinitely event-processing loop
