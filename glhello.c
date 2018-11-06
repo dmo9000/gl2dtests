@@ -40,9 +40,6 @@ int gfx_opengl_drawglyph(BitmapFont *font, uint16_t px, uint16_t py, uint8_t gly
     uint8_t rx = 0;
     uint8_t h = 0;
 
-//    png_bytep row;
-//    png_bytep pixel;
-
 //    printf("gfx_opengl_drawglyph(%u, %u, %u, %u, '%c', fg=%u, bg=%u)\n", px, py, font->header.px, font->header.py, glyph, fg, bg);
 
     if (attr & ATTRIB_REVERSE) {
@@ -185,47 +182,21 @@ void output_character(char c)
     int i = 0, j = 0;
     static int cx=0, cy=0;
 
-
-    /*
-    for (j = (cy * 16); j < (cy*16) + 16; j++) {
-        for (i = (cx * 8); i < (cx*8) + 8; i++) {
-            setTexturePixel(i, j, 0, 0, 0);
-        }
-    }
-    */
-
     gfx_opengl_drawglyph(myfont, cx, cy, c, 7, 0, 0);
     cx++;
     if (cx == 80)	{
         cx = 0;
         cy ++;
     }
-
-
-//    printf("OUTPUT=[%c][%u], cx=%d, cy=%d\r\n", p[0], p[0], cx, cy);
-
 }
 
 void updateTexture()
 {
-
     while (p[0] != 0) {
-        //	printf("OUTPUT=[%c][%u]\r\n", p[0], p[0]);
         output_character(p[0]);
         p++;
     }
-
-    // Update pixels
-//    for(int y = 0; y < 32; ++y)
-//        for(int x = 0; x < 64; ++x)
-//           if(c8.gfx[(y * 64) + x] == 0)
-    //              screenData[y][x][0] = screenData[y][x][1] = screenData[y][x][2] = 0;	// Disabled
-    //         else
-    //            screenData[y][x][0] = screenData[y][x][1] = screenData[y][x][2] = 255;  // Enabled
-
-    // Update Texture
     glTexSubImage2D(GL_TEXTURE_2D, 0,0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)screenData);
-
     glBegin( GL_QUADS );
     glTexCoord2d(0.0, 0.0);
     glVertex2d(0.0,			  0.0);
@@ -240,23 +211,10 @@ void updateTexture()
 
 void display()
 {
-//		printf("display()\n");
-//   myChip8.emulateCycle();
-
-//    if(myChip8.drawFlag)
-//    {
-    // Clear framebuffer
     glClear(GL_COLOR_BUFFER_BIT);
 
-    // Draw pixels to texture
-    //updateTexture(myChip8);
     updateTexture();
-    // Swap buffers!
     glutSwapBuffers();
-
-    // Processed frame
-//        myChip8.drawFlag = false;
-// 	}
 }
 
 void reshape_window(GLsizei w, GLsizei h)
@@ -268,8 +226,6 @@ void reshape_window(GLsizei w, GLsizei h)
     gluOrtho2D(0, w, h, 0);
     glMatrixMode(GL_MODELVIEW);
     glViewport(0, 0, w, h);
-
-    // Resize quad
     display_width = w;
     display_height = h;
 }
