@@ -79,6 +79,20 @@ int gfx_opengl_drawglyph(BitmapFont *font, uint16_t px, uint16_t py, uint8_t gly
     return 0;
 }
 
+void process_Normal_Keys(int key, int x, int y) 
+{
+		printf("process_Normal_Keys()\r\n");
+     switch (key) 
+    {    
+       case 27 :      break;
+       case 100 : printf("GLUT_KEY_LEFT %d\n",key);   break;
+       case 102: printf("GLUT_KEY_RIGHT %d\n",key);  ;  break;
+       case 101   : printf("GLUT_KEY_UP %d\n",key);  ;  break;
+       case 103 : printf("GLUT_KEY_DOWN %d\n",key);  ;  break;
+    }
+
+}
+
 
 int main(int argc, char **argv)
 {
@@ -104,6 +118,8 @@ int main(int argc, char **argv)
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 
+		glutSpecialFunc( process_Normal_Keys );
+
     glutInitWindowSize(display_width, display_height);
     glutInitWindowPosition(320, 320);
     glutCreateWindow("68K");
@@ -111,6 +127,7 @@ int main(int argc, char **argv)
     glutDisplayFunc(display);
     glutIdleFunc(display);
     glutReshapeFunc(reshape_window);
+		//glutSpecialFunc( process_Normal_Keys );
 
     setupTexture();
 
@@ -256,3 +273,5 @@ void reshape_window(GLsizei w, GLsizei h)
     display_width = w;
     display_height = h;
 }
+
+
